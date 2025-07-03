@@ -13,18 +13,52 @@ A comprehensive Dify plugin for managing MCP (Model Context Protocol) servers, e
 
 ## Installation
 
-1. **Set up Python environment with uv**:
+### Using UV (Recommended)
+
+1. **Install UV** if you haven't already:
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+2. **Clone the repository**:
+```bash
+git clone https://github.com/kemier/dify-mcp-adapter.git
+cd dify-mcp-adapter
+```
+
+3. **Set up Python environment with UV**:
 ```bash
 uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
-2. **Install dependencies**:
+4. **Install dependencies**:
 ```bash
 uv pip install -r requirements.txt
 ```
 
-3. **Configure environment** (create `.env` file):
+### Using pip
+
+1. **Clone the repository**:
+```bash
+git clone https://github.com/kemier/dify-mcp-adapter.git
+cd dify-mcp-adapter
+```
+
+2. **Create a virtual environment**:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. **Install dependencies**:
+```bash
+pip install -r requirements.txt
+```
+
+### Configuration
+
+Configure environment variables (create `.env` file):
 ```env
 PLUGIN_HOST=0.0.0.0
 PLUGIN_PORT=5000

@@ -1,0 +1,84 @@
+[project]
+name = "dify-mcp-adapter"
+version = "0.0.1"
+description = "A Dify plugin that enables dynamic interaction with MCP (Model Context Protocol) servers"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+keywords = ["dify", "mcp", "plugin", "ai", "llm"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "dify-plugin>=0.4.0",
+    "aiohttp>=3.12.0",
+    "pydantic>=2.11.0",
+    "pydantic-settings>=2.10.0",
+    "python-dotenv>=1.1.0",
+    "pyyaml>=6.0.0",
+    "requests>=2.32.0",
+    "flask>=3.0.0",
+    "asyncio-throttle>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.0",
+    "pytest-asyncio>=1.0.0",
+    "black>=25.1.0",
+    "flake8>=7.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/kemier/dify-mcp-adapter"
+Repository = "https://github.com/kemier/dify-mcp-adapter"
+Issues = "https://github.com/kemier/dify-mcp-adapter/issues"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["config", "endpoints", "tools"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+
+[tool.flake8]
+max-line-length = 100
+exclude = [".git", "__pycache__", "dist", "build", ".venv"]
+ignore = ["E203", "W503"] 
