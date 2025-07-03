@@ -1,0 +1,23 @@
+# Core Dify Plugin Framework
+dify-plugin>=0.1.0
+
+# HTTP client for making requests to MCP registry
+aiohttp>=3.8.0
+
+# JSON handling and data validation
+pydantic>=2.0.0
+
+# Date and time utilities
+python-dateutil>=2.8.0
+
+# Async support
+asyncio-throttle>=1.0.0
+
+# Configuration and environment management
+python-dotenv>=1.0.0
+
+# Development dependencies (optional)
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+flake8>=6.0.0 

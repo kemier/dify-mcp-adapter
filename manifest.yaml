@@ -1,0 +1,35 @@
+version: 0.0.1
+type: plugin
+author: Dify MCP Team
+name: mcp-adapter
+label:
+  en_US: MCP Server Adapter
+  zh_Hans: MCP服务器适配器
+description:
+  en_US: A comprehensive plugin for managing MCP (Model Context Protocol) servers, fetching available tools, and enabling LLMs to interact with MCP servers dynamically.
+  zh_Hans: 用于管理MCP（模型上下文协议）服务器、获取可用工具并使LLM能够动态与MCP服务器交互的综合插件。
+icon: mcp-icon.svg
+tags:
+  - productivity
+  - utilities
+  - business
+plugins:
+  tools:
+    - name: fetch_mcp_servers
+      label:
+        en_US: Fetch MCP Servers
+        zh_Hans: 获取MCP服务器
+    - name: fetch_tools_schema
+      label:
+        en_US: Fetch Tools Schema
+        zh_Hans: 获取工具架构
+    - name: call_mcp_tool
+      label:
+        en_US: Call MCP Tool
+        zh_Hans: 调用MCP工具
+    - name: manage_mcp_dashboard
+      label:
+        en_US: MCP Dashboard Management
+        zh_Hans: MCP仪表板管理
+  endpoints:
+    - dashboard 

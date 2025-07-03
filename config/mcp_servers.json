@@ -1,0 +1,116 @@
+{
+  "servers": {
+    "github-mcp": {
+      "name": "github-mcp",
+      "url": "https://github.com/modelcontextprotocol/servers/github",
+      "enabled": true,
+      "description": "GitHub integration for MCP",
+      "tags": [
+        "version-control",
+        "collaboration"
+      ],
+      "last_updated": "2025-07-02T20:01:29.954480",
+      "available_tools": [
+        {
+          "name": "create_issue",
+          "description": "Tool: create_issue",
+          "parameters": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_repository",
+          "description": "Tool: get_repository",
+          "parameters": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "search_code",
+          "description": "Tool: search_code",
+          "parameters": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      ]
+    },
+    "slack-mcp": {
+      "name": "slack-mcp",
+      "url": "https://github.com/modelcontextprotocol/servers/slack",
+      "enabled": true,
+      "description": "Slack integration for MCP",
+      "tags": [
+        "communication",
+        "collaboration"
+      ],
+      "last_updated": "2025-07-02T20:01:29.954515",
+      "available_tools": [
+        {
+          "name": "send_message",
+          "description": "Tool: send_message",
+          "parameters": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "create_channel",
+          "description": "Tool: create_channel",
+          "parameters": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_users",
+          "description": "Tool: get_users",
+          "parameters": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      ]
+    },
+    "database-mcp": {
+      "name": "database-mcp",
+      "url": "https://github.com/modelcontextprotocol/servers/database",
+      "enabled": true,
+      "description": "Database operations for MCP",
+      "tags": [
+        "database",
+        "sql"
+      ],
+      "last_updated": "2025-07-02T20:01:29.954541",
+      "available_tools": [
+        {
+          "name": "execute_query",
+          "description": "Tool: execute_query",
+          "parameters": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "get_schema",
+          "description": "Tool: get_schema",
+          "parameters": {
+            "type": "object",
+            "properties": {}
+          }
+        },
+        {
+          "name": "backup_database",
+          "description": "Tool: backup_database",
+          "parameters": {
+            "type": "object",
+            "properties": {}
+          }
+        }
+      ]
+    }
+  },
+  "last_updated": "2025-07-02T20:01:29.955647"
+}
