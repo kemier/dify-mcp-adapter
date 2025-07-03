@@ -219,62 +219,15 @@ When building agents in Dify:
 3. Allow the agent to discover and use tools dynamically
 4. Set up appropriate permissions and validation
 
-## Logging Configuration
+## Environment Variables
 
-The MCP Adapter Plugin includes comprehensive logging functionality that tracks all operations, tool executions, and errors.
+Configure the plugin behavior with these environment variables:
 
-### Log Files
-
-The plugin creates three types of log files in the `logs/` directory:
-
-1. **`mcp_adapter.log`** - General application log with all levels (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-2. **`mcp_adapter_errors.log`** - Error-only log containing ERROR and CRITICAL messages
-3. **`mcp_tool_executions.log`** - Specialized log for tracking tool usage and execution
-
-### Log Levels
-
-- **DEBUG**: Detailed diagnostic information
-- **INFO**: General operational messages
-- **WARNING**: Warning messages (fallbacks, non-critical issues)
-- **ERROR**: Error conditions that don't stop the application
-- **CRITICAL**: Serious errors that may stop the application
-
-### Environment Variables
-
-Configure logging behavior with these environment variables:
-
-- `LOG_LEVEL`: Main logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL) - default: INFO
-- `LOG_DIR`: Directory to store log files - default: logs
-- `CONSOLE_LOG_LEVEL`: Console output level (DEBUG, INFO, WARNING, ERROR, CRITICAL) - default: INFO
-- `ENABLE_CONSOLE_LOGGING`: Enable console output (true/false) - default: true
+- `MCP_REGISTRY_URL`: URL of the MCP registry endpoint
+- `USE_MOCK_DATA`: Use mock data for development (true/false) - default: false
 - `PLUGIN_HOST`: Host to bind the plugin server - default: 0.0.0.0
 - `PLUGIN_PORT`: Port for the plugin server - default: 5000  
 - `PLUGIN_DEBUG`: Enable debug mode (true/false) - default: false
-
-### Log Format
-
-Logs include detailed information:
-```
-2025-07-02 20:01:29 | module_name | LEVEL | filename:line | function | message
-```
-
-### Log Features
-
-- **Rotating logs**: Automatic rotation when files reach 10MB (configurable)
-- **Session tracking**: Each session has a unique ID for request correlation
-- **Tool execution tracking**: Detailed metrics for tool usage and performance
-- **Server operation logging**: Track enable/disable and registry operations
-- **Structured logging**: Consistent format with extra metadata for analysis
-
-### Testing Logging
-
-Run the logging test script to verify functionality:
-
-```bash
-python test_logging.py
-```
-
-This will exercise all logging features and create sample log files.
 
 ## Troubleshooting
 
@@ -283,11 +236,10 @@ This will exercise all logging features and create sample log files.
 1. **Registry Connection Failed**: Check `MCP_REGISTRY_URL` and network connectivity
 2. **Tool Execution Failed**: Verify server is enabled and arguments are correct
 3. **Dashboard Not Loading**: Ensure plugin is running and port is accessible
-4. **Log files not created**: Ensure the application has write permissions to the log directory
 
 ### Debug Mode
 
-Set `LOG_LEVEL=DEBUG` in environment to enable detailed diagnostic logging.
+Set `PLUGIN_DEBUG=true` in environment to enable debug mode.
 
 ### Mock Data
 
