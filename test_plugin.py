@@ -4,22 +4,34 @@ Test script for Dify MCP Adapter Plugin
 """
 
 import json
+import asyncio
 from tools.fetch_mcp_servers import FetchMCPServersTool
 from tools.fetch_tools_schema import FetchToolsSchemaTool
 from tools.call_mcp_tool import CallMCPTool
 from tools.manage_mcp_dashboard import ManageMCPDashboardTool
 
 
-def test_plugin():
-    """Test the plugin tools individually."""
+def test_plugin(use_mock_registry: bool = False):
+    """Test the plugin tools individually.
+    
+    Args:
+        use_mock_registry: If True, uses mock registry data instead of real one
+    """
     
     print("🧪 Testing Dify MCP Adapter Plugin\n")
+    
+    if use_mock_registry:
+        print("🔧 Using mock registry data\n")
     
     # Test 1: Fetch MCP Servers
     print("1️⃣ Testing Fetch MCP Servers Tool")
     fetch_tool = FetchMCPServersTool()
+    
+    # Use mock registry if requested
+    refresh_from_registry = not use_mock_registry
+    
     servers = fetch_tool._invoke("test_user", {
-        "refresh_from_registry": False,
+        "refresh_from_registry": refresh_from_registry,
         "filter_enabled_only": True
     })
     print(f"   Result: {servers['success']}")
@@ -71,6 +83,7 @@ def test_plugin():
         "labels": ["test", "mcp-adapter"]
     }
     
+    # Run tool execution synchronously
     result = call_tool._invoke("test_user", {
         "server_name": "github-mcp",
         "tool_name": "create_issue",
@@ -92,4 +105,4 @@ def test_plugin():
 
 
 if __name__ == "__main__":
-    test_plugin() 
+    test_plugin()

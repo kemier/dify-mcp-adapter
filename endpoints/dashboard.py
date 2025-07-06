@@ -96,6 +96,7 @@ class DashboardEndpoint(Endpoint):
                     <div style="margin-bottom: 20px;">
                         <button class="btn btn-primary" onclick="refreshRegistry()">🔄 Refresh Registry</button>
                         <button class="btn btn-primary" onclick="viewAnalytics()">📊 Analytics</button>
+                        <button class="btn btn-primary" onclick="openRegistrySettings()">⚙️ Registry Settings</button>
                     </div>
                     
                     <div class="servers-grid">
@@ -122,9 +123,9 @@ class DashboardEndpoint(Endpoint):
                                         onclick="toggleServer('{server.name}', {str(server.enabled).lower()})">
                                     {'Disable' if server.enabled else 'Enable'}
                                 </button>
-                                <button class="btn btn-primary" onclick="viewDetails('{server.name}')">
-                                    Details
-                                </button>
+                                <button class="btn btn-primary" onclick="openToolSettings('{server.name}')">
+                            Manage Tools
+                        </button>
                             </div>
                         </div>
                 """
@@ -177,12 +178,275 @@ class DashboardEndpoint(Endpoint):
                         }
                     }
                     
-                    function viewDetails(serverName) {
-                        alert('Server details for ' + serverName + ' - implement as needed');
+                    // Tool management modal
+                    const toolSettingsModal = document.createElement('div');
+                    toolSettingsModal.style.display = 'none';
+                    toolSettingsModal.style.position = 'fixed';
+                    toolSettingsModal.style.top = '0';
+                    toolSettingsModal.style.left = '0';
+                    toolSettingsModal.style.width = '100%';
+                    toolSettingsModal.style.height = '100%';
+                    toolSettingsModal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                    toolSettingsModal.style.zIndex = '1000';
+                    toolSettingsModal.style.alignItems = 'center';
+                    toolSettingsModal.style.justifyContent = 'center';
+                    toolSettingsModal.innerHTML = `
+                        <div style="background: white; padding: 20px; border-radius: 8px; width: 80%; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <h2>Manage Tools - <span id="toolServerName"></span></h2>
+                                <button onclick="toolSettingsModal.style.display='none'" class="btn btn-danger">×</button>
+                            </div>
+                            <div id="toolList"></div>
+                            <div style="margin-top: 20px; text-align: right;">
+                                <button onclick="toolSettingsModal.style.display='none'" class="btn btn-primary">Cancel</button>
+                                <button onclick="saveToolSettings()" class="btn btn-success">Save Changes</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(toolSettingsModal);
+                    let currentServer = '';
+
+                    // Registry settings modal
+                    const registrySettingsModal = document.createElement('div');
+                    registrySettingsModal.style.display = 'none';
+                    registrySettingsModal.style.position = 'fixed';
+                    registrySettingsModal.style.top = '0';
+                    registrySettingsModal.style.left = '0';
+                    registrySettingsModal.style.width = '100%';
+                    registrySettingsModal.style.height = '100%';
+                    registrySettingsModal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                    registrySettingsModal.style.zIndex = '1000';
+                    registrySettingsModal.style.alignItems = 'center';
+                    registrySettingsModal.style.justifyContent = 'center';
+                    registrySettingsModal.innerHTML = `
+                        <div style="background: white; padding: 20px; border-radius: 8px; width: 80%; max-width: 500px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <h2>Registry Settings</h2>
+                                <button onclick="registrySettingsModal.style.display='none'" class="btn btn-danger">×</button>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px;">Registry URL</label>
+                                <input type="text" id="registryUrl" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px;">
+                                    <input type="checkbox" id="autoRefresh"> Auto-refresh servers
+                                </label>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 5px;">Refresh interval (seconds)</label>
+                                <input type="number" id="refreshInterval" min="300" value="3600" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                            <div style="text-align: right;">
+                                <button onclick="registrySettingsModal.style.display='none'" class="btn btn-primary">Cancel</button>
+                                <button onclick="saveRegistrySettings()" class="btn btn-success">Save Settings</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(registrySettingsModal);
+
+                    async function openToolSettings(serverName) {
+                        currentServer = serverName;
+                        document.getElementById('toolServerName').textContent = serverName;
+
+                        try {
+                            const response = await fetch(`/dashboard/api/server/${serverName}/tools`);
+                            const data = await response.json();
+
+                            if (data.success) {
+                                const toolList = document.getElementById('toolList');
+                                toolList.innerHTML = '';
+
+                                data.tools.forEach(tool => {
+                                    const toolDiv = document.createElement('div');
+                                    toolDiv.style.marginBottom = '10px';
+                                    toolDiv.innerHTML = `
+                                        <label style="display: flex; align-items: center;">
+                                            <input type="checkbox" name="tool" value="${tool.name}" ${tool.enabled ? 'checked' : ''} style="margin-right: 10px;">
+                                            <div>
+                                                <strong>${tool.name}</strong>
+                                                <div style="color: #666; font-size: 0.9em;">${tool.description || 'No description'}</div>
+                                            </div>
+                                        </label>
+                                    `;
+                                    toolList.appendChild(toolDiv);
+                                });
+
+                                toolSettingsModal.style.display = 'flex';
+                            } else {
+                                alert('Error loading tools: ' + data.error);
+                            }
+                        } catch (error) {
+                            alert('Network error: ' + error.message);
+                        }
+                    }
+
+                    async function saveToolSettings() {
+                        const selectedTools = Array.from(document.querySelectorAll('input[name="tool"]:checked'))
+                            .map(checkbox => checkbox.value);
+
+                        try {
+                            const response = await fetch('/dashboard/api/manage', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({
+                                    action: 'update_server_tools',
+                                    server_name: currentServer,
+                                    enabled_tools: selectedTools
+                                })
+                            });
+
+                            const result = await response.json();
+                            if (result.success) {
+                                alert('Tools updated successfully!');
+                                toolSettingsModal.style.display = 'none';
+                                location.reload();
+                            } else {
+                                alert('Error updating tools: ' + result.error);
+                            }
+                        } catch (error) {
+                            alert('Network error: ' + error.message);
+                        }
+                    }
+
+                    function openRegistrySettings() {
+                        // In a real implementation, this would load current settings
+                        registrySettingsModal.style.display = 'flex';
+                    }
+
+                    async function saveRegistrySettings() {
+                        const url = document.getElementById('registryUrl').value;
+                        const autoRefresh = document.getElementById('autoRefresh').checked;
+                        const interval = document.getElementById('refreshInterval').value;
+
+                        try {
+                            const response = await fetch('/dashboard/api/manage', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({
+                                    action: 'set_registry_config',
+                                    url: url,
+                                    auto_refresh: autoRefresh,
+                                    refresh_interval: interval
+                                })
+                            });
+
+                            const result = await response.json();
+                            if (result.success) {
+                                alert('Registry settings updated successfully!');
+                                registrySettingsModal.style.display = 'none';
+                                location.reload();
+                            } else {
+                                alert('Error updating settings: ' + result.error);
+                            }
+                        } catch (error) {
+                            alert('Network error: ' + error.message);
+                        }
                     }
                     
                     function viewAnalytics() {
                         alert('Analytics view - implement as needed');
+                    }
+
+                    // Add API endpoint handlers
+                    if (method === 'GET' && path.startsWith('/dashboard/api/server/') && path.endsWith('/tools')) {
+                        const serverName = path.split('/')[4];
+                        const server = mcp_config.get_server(serverName);
+
+                        if (!server) {
+                            return {
+                                'status': 404,
+                                'headers': {'Content-Type': 'application/json'},
+                                'body': json.dumps({'success': false, 'error': 'Server not found'})
+                            };
+                        }
+
+                        // Format tools data
+                        const toolsData = server.available_tools.map(tool => ({
+                            name: tool.name,
+                            description: tool.description,
+                            enabled: server.enabled_tools.includes(tool.name)
+                        }));
+
+                        return {
+                            'status': 200,
+                            'headers': {'Content-Type': 'application/json'},
+                            'body': json.dumps({
+                                'success': true,
+                                'server': serverName,
+                                'tools': toolsData
+                            })
+                        };
+                    }
+
+                    if (method === 'POST' && path === '/dashboard/api/manage') {
+                        try {
+                            const body = json.loads(request.get('body', '{}'));
+                            const action = body.get('action');
+
+                            if (action === 'update_server_tools') {
+                                const serverName = body.get('server_name');
+                                const enabledTools = body.get('enabled_tools', []);
+                                const success = mcp_config.update_server_tools(serverName, enabledTools);
+
+                                return {
+                                    'status': 200,
+                                    'headers': {'Content-Type': 'application/json'},
+                                    'body': json.dumps({
+                                        'success': success,
+                                        'message': 'Tools updated successfully' if success else 'Failed to update tools'
+                                    })
+                                };
+                            }
+
+                            if (action === 'set_registry_config') {
+                                const url = body.get('url');
+                                if (url) {
+                                    mcp_config.set_registry_url(url);
+                                }
+                                // In a real implementation, save auto_refresh and refresh_interval
+                                return {
+                                    'status': 200,
+                                    'headers': {'Content-Type': 'application/json'},
+                                    'body': json.dumps({
+                                        'success': true,
+                                        'message': 'Registry settings updated'
+                                    })
+                                };
+                            }
+
+                            if (action === 'add_server') {
+                                const serverData = body.get('server_data', {});
+                                const success = mcp_config.add_server(serverData);
+                                return {
+                                    'status': 200,
+                                    'headers': {'Content-Type': 'application/json'},
+                                    'body': json.dumps({
+                                        'success': success,
+                                        'message': 'Server added successfully' if success else 'Failed to add server'
+                                    })
+                                };
+                            }
+
+                            if (action === 'remove_server') {
+                                const serverName = body.get('server_name');
+                                const success = mcp_config.remove_server(serverName);
+                                return {
+                                    'status': 200,
+                                    'headers': {'Content-Type': 'application/json'},
+                                    'body': json.dumps({
+                                        'success': success,
+                                        'message': 'Server removed successfully' if success else 'Failed to remove server'
+                                    })
+                                };
+                            }
+                        } catch (e) {
+                            return {
+                                'status': 500,
+                                'headers': {'Content-Type': 'application/json'},
+                                'body': json.dumps({'success': false, 'error': str(e)})
+                            };
+                        }
                     }
                 </script>
             </body>
@@ -268,4 +532,4 @@ class DashboardEndpoint(Endpoint):
             "status": 404,
             "headers": {"Content-Type": "text/plain"},
             "body": "Not Found"
-        } 
+        }

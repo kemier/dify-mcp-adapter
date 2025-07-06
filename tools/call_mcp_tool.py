@@ -43,10 +43,20 @@ class MCPToolExecutor:
                     "error": error_msg
                 }
             
-            # Check if tool exists
+            # Check if tool exists and is enabled
             tool_exists = any(tool["name"] == tool_name for tool in server.available_tools)
             if not tool_exists:
                 error_msg = f"Tool '{tool_name}' not found on server '{server_name}'"
+                logger.warning(error_msg)
+                return {
+                    "success": False,
+                    "error": error_msg
+                }
+
+            # Check if tool is enabled
+            tool_enabled = tool_name in server.enabled_tools
+            if not tool_enabled:
+                error_msg = f"Tool '{tool_name}' is not enabled on server '{server_name}'"
                 logger.warning(error_msg)
                 return {
                     "success": False,
@@ -389,4 +399,4 @@ class CallMCPTool(Tool):
                 "success": False,
                 "error": error_msg,
                 "message": f"Unexpected error while executing tool: {error_msg}"
-            } 
+            }

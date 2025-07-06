@@ -15,21 +15,9 @@ tags:
   - business
 plugins:
   tools:
-    - name: fetch_mcp_servers
-      label:
-        en_US: Fetch MCP Servers
-        zh_Hans: 获取MCP服务器
-    - name: fetch_tools_schema
-      label:
-        en_US: Fetch Tools Schema
-        zh_Hans: 获取工具架构
+    - name: fetch_enabled_tools
+      description: Fetch schema information for user-enabled tools across all MCP servers
     - name: call_mcp_tool
-      label:
-        en_US: Call MCP Tool
-        zh_Hans: 调用MCP工具
-    - name: manage_mcp_dashboard
-      label:
-        en_US: MCP Dashboard Management
-        zh_Hans: MCP仪表板管理
+      description: Execute a specific tool on a selected MCP server with arguments
   endpoints:
-    - dashboard 
+    - dashboard

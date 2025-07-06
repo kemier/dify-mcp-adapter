@@ -25,8 +25,8 @@ log_config = initialize_logging(
 logger = get_logger(__name__)
 
 from dify_plugin import DifyPlugin
-from tools.fetch_mcp_servers import FetchMCPServersTool
-from tools.fetch_tools_schema import FetchToolsSchemaTool
+
+from tools.fetch_enabled_tools import FetchEnabledToolsTool
 from tools.call_mcp_tool import CallMCPTool
 from tools.manage_mcp_dashboard import ManageMCPDashboardTool
 from endpoints.dashboard import DashboardEndpoint
@@ -45,12 +45,15 @@ def create_plugin():
         logger.info("Plugin instance created successfully")
         
         # Register tools
-        logger.info("Registering plugin tools")
-        plugin.register_tool(FetchMCPServersTool())
-        plugin.register_tool(FetchToolsSchemaTool())
-        plugin.register_tool(CallMCPTool())
-        plugin.register_tool(ManageMCPDashboardTool())
-        logger.info("All tools registered successfully")
+        try:
+            logger.info("Registering plugin tools")
+            plugin.register_tool(FetchEnabledToolsTool())
+            plugin.register_tool(CallMCPTool())
+            
+            logger.info("All tools registered successfully")
+        except Exception as e:
+            logger.error(f"Failed to register tools: {str(e)}")
+            sys.exit(1)
         
         # Register endpoints
         logger.info("Registering plugin endpoints")
@@ -94,4 +97,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()

@@ -35,7 +35,8 @@
             "properties": {}
           }
         }
-      ]
+      ],
+      "enabled_tools": null
     },
     "slack-mcp": {
       "name": "slack-mcp",
@@ -72,7 +73,8 @@
             "properties": {}
           }
         }
-      ]
+      ],
+      "enabled_tools": null
     },
     "database-mcp": {
       "name": "database-mcp",
@@ -109,8 +111,14 @@
             "properties": {}
           }
         }
-      ]
+      ],
+      "enabled_tools": null
     }
   },
-  "last_updated": "2025-07-02T20:01:29.955647"
+  "registry": {
+    "url": "http://localhost:8080/api/mcp-servers",
+    "auto_refresh": false,
+    "refresh_interval": 3600
+  },
+  "last_updated": "2025-07-06T21:57:45.898523"
 }

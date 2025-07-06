@@ -25,6 +25,20 @@ class MCPServer:
     tags: List[str] = None
     last_updated: str = ""
     available_tools: List[Dict[str, Any]] = None
+    enabled_tools: List[str] = None  # Track enabled tools for this server
+
+    def __post_init__(self):
+        if self.tags is None:
+            self.tags = []
+        if self.available_tools is None:
+            self.available_tools = []
+        if self.enabled_tools is None:
+            self.enabled_tools = []
+        if not self.last_updated:
+            self.last_updated = datetime.now().isoformat()
+        # If enabled_tools is empty but we have available_tools, enable all by default
+        if not self.enabled_tools and self.available_tools:
+            self.enabled_tools = [tool['name'] for tool in self.available_tools]
     
     def __post_init__(self):
         if self.tags is None:
@@ -41,8 +55,38 @@ class MCPConfig:
     def __init__(self, config_file: str = "config/mcp_servers.json"):
         self.config_file = config_file
         self.servers: Dict[str, MCPServer] = {}
-        self.registry_url = "https://registry.com/api/mcp-servers"  # Registry endpoint
+        self.registry_url = os.getenv("MCP_REGISTRY_URL", "http://localhost:8080/api/mcp-servers")  # Configurable registry endpoint
         self._load_config()
+        self._load_registry_config()
+
+    def _load_registry_config(self):
+        """Load registry configuration from environment or config file"""
+        # Load from config file if available
+        if hasattr(self, 'config_data') and 'registry' in self.config_data:
+            self.registry_url = self.config_data['registry'].get('url', self.registry_url)
+            self.auto_refresh = self.config_data['registry'].get('auto_refresh', False)
+            self.refresh_interval = self.config_data['registry'].get('refresh_interval', 3600)
+        else:
+            self.auto_refresh = os.getenv("MCP_REGISTRY_AUTO_REFRESH", "false").lower() == "true"
+            self.refresh_interval = int(os.getenv("MCP_REGISTRY_REFRESH_INTERVAL", "3600"))
+
+    def set_registry_url(self, url: str):
+        """Set the registry URL and save configuration"""
+        self.registry_url = url
+        # Save to config file
+        config_data = {
+            'servers': {name: asdict(server) for name, server in self.servers.items()},
+            'registry': {
+                'url': url,
+                'auto_refresh': self.auto_refresh,
+                'refresh_interval': self.refresh_interval
+            },
+            'last_updated': datetime.now().isoformat()
+        }
+        with open(self.config_file, 'w') as f:
+            json.dump(config_data, f, indent=2)
+        logger.info(f"Updated registry URL to: {url}")
+        return True
     
     def _load_config(self):
         """Load configuration from file."""
@@ -199,6 +243,68 @@ class MCPConfig:
     def get_enabled_servers(self) -> List[MCPServer]:
         """Get all enabled servers."""
         return [server for server in self.servers.values() if server.enabled]
+
+    def update_server_tools(self, server_name: str, enabled_tools: List[str]) -> bool:
+        """Update enabled tools for a specific server"""
+        if server_name not in self.servers:
+            logger.error(f"Server {server_name} not found")
+            return False
+
+        server = self.servers[server_name]
+        # Validate tools exist
+        available_tool_names = [tool['name'] for tool in server.available_tools]
+        for tool_name in enabled_tools:
+            if tool_name not in available_tool_names:
+                logger.warning(f"Tool {tool_name} not available for server {server_name}")
+                return False
+
+        server.enabled_tools = enabled_tools
+        server.last_updated = datetime.now().isoformat()
+        self._save_config()
+        logger.info(f"Updated enabled tools for {server_name}: {enabled_tools}")
+        return True
+
+    def add_server(self, server_data: Dict[str, Any]) -> bool:
+        """Manually add a new MCP server"""
+        name = server_data.get('name')
+        if not name:
+            logger.error("Server name is required")
+            return False
+
+        if name in self.servers:
+            logger.error(f"Server {name} already exists")
+            return False
+
+        server = MCPServer(
+            name=name,
+            url=server_data.get('url', ''),
+            description=server_data.get('description', ''),
+            tags=server_data.get('tags', []),
+            enabled=server_data.get('enabled', True),
+            available_tools=server_data.get('available_tools', [])
+        )
+        self.servers[name] = server
+        self._save_config()
+        logger.info(f"Added new server: {name}")
+        return True
+
+    def remove_server(self, server_name: str) -> bool:
+        """Remove an MCP server"""
+        if server_name not in self.servers:
+            logger.error(f"Server {server_name} not found")
+            return False
+
+        del self.servers[server_name]
+        self._save_config()
+        logger.info(f"Removed server: {server_name}")
+        return True
+
+    def get_server_enabled_tools(self, server_name: str) -> List[str]:
+        """Get enabled tools for a specific server"""
+        server = self.get_server(server_name)
+        if not server:
+            return []
+        return server.enabled_tools or []
     
     def enable_server(self, name: str) -> bool:
         """Enable a server."""
@@ -240,4 +346,4 @@ class MCPConfig:
         result = {}
         for server in self.get_enabled_servers():
             result[server.name] = server.available_tools
-        return result 
+        return result

@@ -7,58 +7,67 @@ A comprehensive Dify plugin for managing MCP (Model Context Protocol) servers, e
 - 🔌 **MCP Server Discovery**: Automatically fetch MCP servers from registry endpoints
 - 🛠️ **Dynamic Tool Management**: Discover and manage tools from multiple MCP servers
 - 🎯 **LLM Integration**: Allow LLMs to query tool schemas and execute tools with validation
-- 📊 **Management Dashboard**: Web-based dashboard for server management and analytics
 - ⚡ **Real-time Updates**: Refresh server configurations and tool availability
 - 🔒 **Argument Validation**: Validate tool arguments against schemas before execution
+- ✅ **Tool Filtering**: Filter tools by enabled/disabled status
+- 🚀 **Mock Registry**: Local mock registry for development/testing
 
 ## Installation
 
 ### Using UV (Recommended)
 
 1. **Install UV** if you haven't already:
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
 
-2. **Clone the repository**:
-```bash
-git clone https://github.com/kemier/dify-mcp-adapter.git
-cd dify-mcp-adapter
-```
+  ```bash
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  ```
 
-3. **Set up Python environment with UV**:
-```bash
-uv venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-```
+1. **Clone the repository**:
 
-4. **Install dependencies**:
-```bash
-uv pip install -r requirements.txt
-```
+  ```bash
+  git clone https://github.com/kemier/dify-mcp-adapter.git
+  cd dify-mcp-adapter
+  ````
+
+1. **Set up Python environment with UV**:
+
+  ```bash
+  uv venv
+  source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+  ```
+
+1. **Install dependencies**:
+
+  ```bash
+  uv pip install -r requirements.txt
+  ```
 
 ### Using pip
 
 1. **Clone the repository**:
+
 ```bash
 git clone https://github.com/kemier/dify-mcp-adapter.git
 cd dify-mcp-adapter
 ```
 
-2. **Create a virtual environment**:
+1. **Create a virtual environment**:
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. **Install dependencies**:
+1. **Install dependencies**:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### Configuration
+## Environment Configuration
 
 Configure environment variables (create `.env` file):
+
 ```env
 PLUGIN_HOST=0.0.0.0
 PLUGIN_PORT=5000
@@ -77,49 +86,41 @@ python -m main
 
 The plugin will start on `http://localhost:5000` by default.
 
+### Tool Categories
+
 ### Available Tools
 
-#### 1. Fetch MCP Servers
-Retrieves available MCP servers from the registry.
+### Core Tools
+
+1. **Fetch Enabled Tools**
+
+Retrieves available tools from MCP servers with enabled/disabled status.
 
 **Parameters:**
-- `refresh_from_registry` (boolean): Whether to fetch fresh data from registry
-- `filter_enabled_only` (boolean): Only return enabled servers
+
+- `include_disabled` (boolean): Include disabled tools in results (default: false)
 
 **Usage:**
+
 ```json
 {
-  "refresh_from_registry": true,
-  "filter_enabled_only": false
+  "include_disabled": true
 }
 ```
 
-#### 2. Fetch Tools Schema
-Gets schema information for tools from MCP servers.
+1.1. **Call MCP Tool**
 
-**Parameters:**
-- `server_name` (string): Specific server to get tools from
-- `tool_name` (string): Specific tool to get schema for
-- `include_examples` (boolean): Include usage examples
-
-**Usage:**
-```json
-{
-  "server_name": "github-mcp",
-  "include_examples": true
-}
-```
-
-#### 3. Call MCP Tool
 Executes a tool on an MCP server with provided arguments.
 
 **Parameters:**
+
 - `server_name` (string, required): MCP server name
 - `tool_name` (string, required): Tool name to execute
 - `arguments` (string): JSON string of tool arguments
 - `validate_args` (boolean): Whether to validate arguments
 
 **Usage:**
+
 ```json
 {
   "server_name": "github-mcp",
@@ -129,29 +130,41 @@ Executes a tool on an MCP server with provided arguments.
 }
 ```
 
-#### 4. Manage MCP Dashboard
-Provides dashboard management operations.
+### Development Tools
 
-**Actions:**
-- `get_status`: Get overall server status
-- `enable_server`: Enable a specific server
-- `disable_server`: Disable a specific server
-- `refresh_registry`: Refresh from registry
-- `get_server_details`: Get detailed server information
-- `get_analytics`: Get analytics data
+1. **Mock Registry Server**
+
+Local development server that provides mock MCP server data.
+
+**Usage:**
+
+```bash
+python demo.py
+```
+
+Access mock data at: `http://localhost:8080/api/mcp-servers`
+
+### Deprecated Tools
+
+The following tools have been consolidated into the core tools:
+
+- Fetch MCP Servers
+- Fetch Tools Schema
+- Manage MCP Dashboard
 
 ### Web Dashboard
 
 Access the management dashboard at `http://localhost:5000/dashboard`
 
 The dashboard provides:
+
 - Server overview and statistics
 - Enable/disable server controls
 - Registry refresh functionality
 - Server details and tool listings
 - Analytics and usage metrics
 
-## Configuration
+## Server Configuration
 
 ### MCP Server Configuration
 
@@ -167,7 +180,7 @@ When `USE_MOCK_DATA=true`, the plugin uses mock MCP servers for development:
 
 ## Architecture
 
-```
+```tree
 dify-mcp-adapter/
 ├── main.py                 # Plugin entry point
 ├── manifest.yaml          # Plugin manifest
@@ -279,6 +292,17 @@ Set `PLUGIN_DEBUG=true` in environment to enable debug mode.
 
 Use mock data for development without external dependencies (automatically used when registry fails).
 
+To explicitly test with mock registry data:
+
+```python
+# Run standard tests with mock registry
+python tests/test_plugin_with_mock_registry.py
+
+# Or run individual test with mock registry
+from test_plugin import test_plugin
+test_plugin(use_mock_registry=True)
+```
+
 ## Contributing
 
 1. Fork the repository
@@ -294,6 +318,7 @@ This project is licensed under the MIT License.
 ## Support
 
 For issues and questions:
+
 - Open an issue on the repository
 - Check the Dify plugin documentation
-- Review the MCP specification 
+- Review the MCP specification
